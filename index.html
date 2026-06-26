@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkers</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔴</text></svg>">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>Checkers</h1>
+        </header>
+
+        <div id="game-screen">
+            <div id="status-bar">
+                <div id="player-red" class="player-indicator">
+                    <div class="piece-preview red"></div>
+                    <span id="red-name">Red</span>
+                    <span id="red-count" class="piece-count">12</span>
+                </div>
+                <div id="turn-label">Red's Turn</div>
+                <div id="player-black" class="player-indicator">
+                    <div class="piece-preview black"></div>
+                    <span id="black-name">Black</span>
+                    <span id="black-count" class="piece-count">12</span>
+                </div>
+            </div>
+
+            <div id="board-wrap">
+                <div id="board"></div>
+            </div>
+
+            <div id="bottom-bar">
+                <button id="new-game-btn">New Game</button>
+                <div id="message-box"></div>
+            </div>
+        </div>
+
+        <div id="win-overlay" class="hidden">
+            <div class="win-modal">
+                <div class="trophy">🏆</div>
+                <h2 id="win-title">Red Wins!</h2>
+                <p id="win-sub"></p>
+                <button id="play-again-btn">Play Again</button>
+            </div>
+        </div>
+    </div>
+    <script src="game.js"></script>
+</body>
+</html>
