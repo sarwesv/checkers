@@ -28,6 +28,18 @@
                 </div>
             </div>
 
+            <div id="mode-bar">
+                <div id="mode-toggle">
+                    <button class="mode-btn active" id="btn-2p">2 Players</button>
+                    <button class="mode-btn" id="btn-ai">vs AI</button>
+                </div>
+                <div id="difficulty-wrap" class="hidden">
+                    <span class="diff-label">Difficulty</span>
+                    <input type="range" id="difficulty-slider" min="1" max="10" value="5" step="1">
+                    <span id="diff-val">5</span>
+                </div>
+            </div>
+
             <div id="board-wrap">
                 <div id="board"></div>
             </div>

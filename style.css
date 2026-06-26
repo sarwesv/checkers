@@ -10,7 +10,7 @@
     --gold:   #f0c040;
     --board-light: #f0d9b5;
     --board-dark:  #b58863;
-    --size: min(520px, min(calc(100vw - 32px), 88vh - 100px));
+    --size: min(520px, min(calc(100vw - 32px), 88vh - 140px));
 }
 
 body {
@@ -89,6 +89,101 @@ header h1 {
     letter-spacing: 1px;
     text-align: center;
     flex: 1;
+}
+
+/* ── Mode bar ── */
+#mode-bar {
+    width: var(--size);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+#mode-toggle {
+    display: flex;
+    gap: 6px;
+}
+
+.mode-btn {
+    padding: 7px 16px;
+    background: transparent;
+    border: 1.5px solid var(--gold);
+    border-radius: 8px;
+    color: var(--gold);
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.18s, color 0.18s;
+    letter-spacing: 0.3px;
+}
+
+.mode-btn.active {
+    background: var(--gold);
+    color: #1a0e08;
+}
+
+.mode-btn:not(.active):hover {
+    background: rgba(240,192,64,0.12);
+}
+
+#difficulty-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    justify-content: flex-end;
+}
+
+.diff-label {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: rgba(240,192,64,0.85);
+    white-space: nowrap;
+}
+
+#difficulty-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 110px;
+    height: 5px;
+    border-radius: 3px;
+    background: rgba(255,255,255,0.18);
+    outline: none;
+    cursor: pointer;
+    accent-color: var(--gold);
+}
+
+#difficulty-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--gold);
+    cursor: pointer;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+    border: 2px solid #1a0e08;
+}
+
+#difficulty-slider::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--gold);
+    cursor: pointer;
+    border: 2px solid #1a0e08;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+}
+
+#diff-val {
+    font-size: 0.88rem;
+    font-weight: 800;
+    color: var(--gold);
+    min-width: 16px;
+    text-align: center;
 }
 
 /* ── Board ── */
