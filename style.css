@@ -208,6 +208,12 @@ header h1 {
     grid-template-rows: repeat(8, 12.5%);
 }
 
+#pieces-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
 .square {
     position: relative;
     cursor: default;
@@ -231,12 +237,24 @@ header h1 {
     border: 2px solid rgba(50,200,50,0.7);
 }
 
-/* ── Pieces ── */
+/* ── Pieces ──
+   .piece is the positioning shell — one persistent DOM node per checker,
+   moved across the board by animating left/top so it glides between
+   squares instead of being torn down and rebuilt on every render.
+   .piece-circle is the visual disc nested inside it. */
 .piece {
+    position: absolute;
+    width: 12.5%;
+    height: 12.5%;
+    cursor: pointer;
+    pointer-events: auto;
+    transition: left 0.28s cubic-bezier(0.4, 0, 0.2, 1), top 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.piece-circle {
     position: absolute;
     inset: 8%;
     border-radius: 50%;
-    cursor: pointer;
     transition: transform 0.12s, box-shadow 0.12s;
     display: flex;
     align-items: center;
@@ -245,7 +263,7 @@ header h1 {
     user-select: none;
 }
 
-.piece.red {
+.piece-circle.red {
     background: radial-gradient(circle at 35% 28%, #ff6b6b, #c0392b 55%, #7b0000);
     border: 2.5px solid rgba(255,255,255,0.35);
     box-shadow:
@@ -253,7 +271,7 @@ header h1 {
         inset 0 1px 0 rgba(255,255,255,0.3);
 }
 
-.piece.black {
+.piece-circle.black {
     background: radial-gradient(circle at 35% 28%, #777, #2c2c2c 55%, #000);
     border: 2.5px solid rgba(255,255,255,0.18);
     box-shadow:
@@ -261,7 +279,7 @@ header h1 {
         inset 0 1px 0 rgba(255,255,255,0.15);
 }
 
-.piece.selected {
+.piece-circle.selected {
     transform: scale(1.12) translateY(-8%);
     box-shadow:
         0 6px 20px rgba(0,0,0,0.6),
@@ -270,11 +288,11 @@ header h1 {
     z-index: 10;
 }
 
-.piece:hover:not(.selected) {
+.piece:hover .piece-circle:not(.selected) {
     transform: scale(1.07) translateY(-3%);
 }
 
-.piece.king::after {
+.piece-circle.king::after {
     content: '♛';
     font-size: 0.9em;
     filter: drop-shadow(0 1px 2px rgba(0,0,0,0.8));
@@ -282,7 +300,7 @@ header h1 {
 }
 
 /* must-jump highlight */
-.piece.must-jump {
+.piece-circle.must-jump {
     animation: must-pulse 1s ease-in-out infinite;
 }
 
@@ -292,7 +310,7 @@ header h1 {
 }
 
 /* jump captured flash */
-.piece.captured {
+.piece-circle.captured {
     animation: capture-fade 0.3s forwards;
 }
 

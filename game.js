@@ -6,12 +6,18 @@
 const RED   = 'red';
 const BLACK = 'black';
 
-let board      = [];   // 8×8 array of null | { color, king }
+let board      = [];   // 8×8 array of null | { id, color, king }
 let turn       = RED;
 let selected   = null; // { row, col } of selected piece
 let validMoves = [];   // [{ row, col, jumps: [{row,col}] }]
 let mustJump   = [];   // all pieces that must jump this turn
 let gameOver   = false;
+
+// Piece identity — lets render() reuse the same DOM node for a piece across
+// moves (keyed by id) instead of rebuilding it, so moves can glide via CSS
+// transition rather than jumping.
+let nextPieceId    = 0;
+const pieceElements = new Map(); // id -> DOM element
 
 // AI state
 let aiMode     = false;
@@ -25,15 +31,17 @@ function initBoard() {
     // Black on rows 0-2, dark squares only
     for (let r = 0; r < 3; r++) {
         for (let c = 0; c < 8; c++) {
-            if ((r + c) % 2 === 1) board[r][c] = { color: BLACK, king: false };
+            if ((r + c) % 2 === 1) board[r][c] = { id: nextPieceId++, color: BLACK, king: false };
         }
     }
     // Red on rows 5-7, dark squares only
     for (let r = 5; r < 8; r++) {
         for (let c = 0; c < 8; c++) {
-            if ((r + c) % 2 === 1) board[r][c] = { color: RED, king: false };
+            if ((r + c) % 2 === 1) board[r][c] = { id: nextPieceId++, color: RED, king: false };
         }
     }
+    pieceElements.clear();
+    document.getElementById('pieces-layer').innerHTML = '';
     turn       = RED;
     selected   = null;
     validMoves = [];
@@ -488,11 +496,15 @@ function triggerAI() {
 // ── Render ─────────────────────────────────────────────────────────────────
 
 function render() {
+    renderSquares();
+    renderPieces();
+}
+
+function renderSquares() {
     const boardEl = document.getElementById('board');
     boardEl.innerHTML = '';
 
     const validSet = new Set(validMoves.map(m => `${m.row},${m.col}`));
-    const mustSet  = new Set(mustJump.map(m => `${m.row},${m.col}`));
 
     for (let r = 0; r < 8; r++) {
         for (let c = 0; c < 8; c++) {
@@ -504,23 +516,56 @@ function render() {
                 sq.addEventListener('click', () => onSquareClick(r, c));
             }
 
-            const piece = board[r][c];
-            if (piece) {
-                const el = document.createElement('div');
-                el.className = `piece ${piece.color}`;
-                if (piece.king) el.classList.add('king');
-                if (selected && selected.row === r && selected.col === c) {
-                    el.classList.add('selected');
-                }
-                if (mustSet.has(`${r},${c}`) && !selected) {
-                    el.classList.add('must-jump');
-                }
-                el.addEventListener('click', () => onSquareClick(r, c));
-                sq.appendChild(el);
-            }
-
             boardEl.appendChild(sq);
         }
+    }
+}
+
+function renderPieces() {
+    const layer = document.getElementById('pieces-layer');
+    const mustSet = new Set(mustJump.map(m => `${m.row},${m.col}`));
+    const seen = new Set();
+
+    for (let r = 0; r < 8; r++) {
+        for (let c = 0; c < 8; c++) {
+            const piece = board[r][c];
+            if (!piece) continue;
+            seen.add(piece.id);
+
+            let el = pieceElements.get(piece.id);
+            if (!el) {
+                el = document.createElement('div');
+                el.className = 'piece';
+                el.style.left = `${c * 12.5}%`;
+                el.style.top  = `${r * 12.5}%`;
+                el.appendChild(document.createElement('div')); // piece-circle
+                layer.appendChild(el);
+                pieceElements.set(piece.id, el);
+            } else {
+                // Same DOM node, new position — CSS transition glides it over.
+                el.style.left = `${c * 12.5}%`;
+                el.style.top  = `${r * 12.5}%`;
+            }
+            el.onclick = () => onSquareClick(r, c);
+
+            const circle = el.firstChild;
+            circle.className = `piece-circle ${piece.color}`;
+            if (piece.king) circle.classList.add('king');
+            if (selected && selected.row === r && selected.col === c) {
+                circle.classList.add('selected');
+            }
+            if (mustSet.has(`${r},${c}`) && !selected) {
+                circle.classList.add('must-jump');
+            }
+        }
+    }
+
+    // Remove pieces that were captured — fade out, then drop the node.
+    for (const [id, el] of pieceElements) {
+        if (seen.has(id)) continue;
+        pieceElements.delete(id);
+        el.firstChild.classList.add('captured');
+        setTimeout(() => el.remove(), 300);
     }
 }
 
