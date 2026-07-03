@@ -255,6 +255,9 @@ function endGame(winner) {
     document.getElementById('win-sub').textContent =
         winner === RED ? 'Black has no moves left.' : 'Red has no moves left.';
     document.getElementById('win-overlay').classList.remove('hidden');
+    gsap.fromTo('.win-modal',
+        { scale: 0.5, opacity: 0 },
+        { scale: 1, opacity: 1, duration: 0.4, ease: 'back.out(1.7)' });
 }
 
 // ── AI — board generation ───────────────────────────────────────────────────
@@ -533,18 +536,20 @@ function renderPieces() {
             seen.add(piece.id);
 
             let el = pieceElements.get(piece.id);
+            const targetLeft = `${c * 12.5}%`;
+            const targetTop  = `${r * 12.5}%`;
+
             if (!el) {
                 el = document.createElement('div');
                 el.className = 'piece';
-                el.style.left = `${c * 12.5}%`;
-                el.style.top  = `${r * 12.5}%`;
+                el.style.left = targetLeft;
+                el.style.top  = targetTop;
                 el.appendChild(document.createElement('div')); // piece-circle
                 layer.appendChild(el);
                 pieceElements.set(piece.id, el);
             } else {
-                // Same DOM node, new position — CSS transition glides it over.
-                el.style.left = `${c * 12.5}%`;
-                el.style.top  = `${r * 12.5}%`;
+                // Same DOM node, new position — GSAP glides it over.
+                gsap.to(el, { left: targetLeft, top: targetTop, duration: 0.28, ease: 'power2.out' });
             }
             el.onclick = () => onSquareClick(r, c);
 
@@ -564,8 +569,7 @@ function renderPieces() {
     for (const [id, el] of pieceElements) {
         if (seen.has(id)) continue;
         pieceElements.delete(id);
-        el.firstChild.classList.add('captured');
-        setTimeout(() => el.remove(), 300);
+        gsap.to(el.firstChild, { opacity: 0, scale: 0.3, duration: 0.3, onComplete: () => el.remove() });
     }
 }
 
